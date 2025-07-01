@@ -30,7 +30,7 @@ func ToMarkdownTable(rows [][]string) string {
 	buf.WriteString("\n|")
 
 	// Header separator
-	for i := 0; i < headerColCount; i++ {
+	for range headerColCount {
 		buf.WriteString(" --- |")
 	}
 	buf.WriteString("\n")
