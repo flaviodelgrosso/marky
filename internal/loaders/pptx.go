@@ -9,18 +9,18 @@ import (
 	"fmt"
 	"html"
 	"io"
+	"os"
 	"regexp"
 	"strings"
 
 	"github.com/flaviodelgrosso/marky/internal/mimetypes"
-	"github.com/flaviodelgrosso/marky/internal/utils"
 )
 
 type PptxLoader struct{}
 
 // Load reads a PPTX file and converts it to markdown format.
 func (*PptxLoader) Load(path string) (string, error) {
-	data, err := utils.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to read PPTX file: %w", err)
 	}

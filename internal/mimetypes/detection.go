@@ -4,10 +4,9 @@ import (
 	"bytes"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/flaviodelgrosso/marky/internal/utils"
 )
 
 // MimeTypeInfo contains MIME type and file extension information
@@ -19,7 +18,7 @@ type MimeTypeInfo struct {
 // DetectMimeType detects the MIME type of a file from its content and extension
 func DetectMimeType(filePath string) (*MimeTypeInfo, error) {
 	// Read the file content
-	data, err := utils.ReadFile(filePath)
+	data, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to read file for MIME type detection: %w", err)
 	}

@@ -2,10 +2,10 @@ package loaders
 
 import (
 	"fmt"
+	"os"
 
 	html2md "github.com/JohannesKaufmann/html-to-markdown/v2"
 	"github.com/flaviodelgrosso/marky/internal/mimetypes"
-	"github.com/flaviodelgrosso/marky/internal/utils"
 )
 
 // HTMLLoader handles loading and converting HTML files to markdown.
@@ -13,7 +13,7 @@ type HTMLLoader struct{}
 
 // Load reads an HTML file and converts it to markdown.
 func (*HTMLLoader) Load(path string) (string, error) {
-	input, err := utils.ReadFile(path)
+	input, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to read HTML file: %w", err)
 	}
