@@ -24,7 +24,7 @@ func main() {
 				return fmt.Errorf("input file does not exist: %s", input)
 			}
 
-			md := marky.Initialize()
+			md := marky.New()
 			result, err := md.Convert(input)
 			if err != nil {
 				return fmt.Errorf("failed to convert file: %w", err)

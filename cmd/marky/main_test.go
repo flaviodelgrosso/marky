@@ -22,7 +22,7 @@ func TestMain_Convert_CSV(t *testing.T) {
 	}
 
 	// Test conversion
-	md := marky.Initialize()
+	md := marky.New()
 	result, err := md.Convert(csvFile)
 	if err != nil {
 		t.Errorf("Convert() error = %v, wantErr false", err)
@@ -55,7 +55,7 @@ func TestMain_Convert_HTML(t *testing.T) {
 	}
 
 	// Test conversion
-	md := marky.Initialize()
+	md := marky.New()
 	result, err := md.Convert(htmlFile)
 	if err != nil {
 		t.Errorf("Convert() error = %v, wantErr false", err)
@@ -85,7 +85,7 @@ func TestMain_Convert_UnsupportedFormat(t *testing.T) {
 	}
 
 	// Test conversion should fail
-	md := marky.Initialize()
+	md := marky.New()
 	_, err = md.Convert(unsupportedFile)
 	if err == nil {
 		t.Error("Convert() should return error for unsupported file format")
@@ -99,7 +99,7 @@ func TestMain_Convert_UnsupportedFormat(t *testing.T) {
 
 func TestMain_Convert_NonexistentFile(t *testing.T) {
 	// Test conversion of nonexistent file
-	md := marky.Initialize()
+	md := marky.New()
 	_, err := md.Convert("/nonexistent/file.txt")
 	if err == nil {
 		t.Error("Convert() should return error for nonexistent file")
@@ -112,12 +112,12 @@ func TestMain_Convert_NonexistentFile(t *testing.T) {
 }
 
 func TestMain_AllLoadersRegistered(t *testing.T) {
-	md := marky.Initialize()
+	md := marky.New()
 
 	// Cast to concrete type to access Loaders field
 	markyInstance, ok := md.(*markyInternal.Marky)
 	if !ok {
-		t.Fatal("Initialize() should return *marky.marky")
+		t.Fatal("New() should return *marky.marky")
 	}
 
 	// Check that we have the expected number of loaders
@@ -167,7 +167,7 @@ func TestMain_WriteToFile(t *testing.T) {
 	}
 
 	// Convert to markdown
-	md := marky.Initialize()
+	md := marky.New()
 	result, err := md.Convert(csvFile)
 	if err != nil {
 		t.Fatalf("Convert() error = %v", err)

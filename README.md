@@ -78,7 +78,7 @@ import (
 
 func main() {
     // Initialize Marky with all available loaders
-    m := marky.Initialize()
+    m := marky.New()
     
     // Convert a document to Markdown
     result, err := m.Convert("document.pdf")
@@ -154,7 +154,7 @@ To add support for a new document format:
    }
    ```
 
-3. Register the loader in the `Initialize()` function in `lib.go`
+3. Register the loader in the `New()` function in `lib.go`
 4. Add tests for your new loader
 
 ## 📄 License

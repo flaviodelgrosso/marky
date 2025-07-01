@@ -20,22 +20,22 @@ func TestInitialize(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := Initialize()
+			result := New()
 
 			// Check that result is not nil
 			if result == nil {
-				t.Error("Initialize() should not return nil")
+				t.Error("New() should not return nil")
 			}
 
 			// Check that it's a Marky instance
 			instance, ok := result.(*marky.Marky)
 			if !ok {
-				t.Error("Initialize() should return a *marky instance")
+				t.Error("New() should return a *marky instance")
 			}
 
 			// Check that all expected loaders are registered
 			if len(instance.Loaders) != tt.expectedLoaderLen {
-				t.Errorf("Initialize() should register %d loaders, got %d", tt.expectedLoaderLen, len(instance.Loaders))
+				t.Errorf("New() should register %d loaders, got %d", tt.expectedLoaderLen, len(instance.Loaders))
 			}
 
 			// Check that specific loader types are present
@@ -79,7 +79,7 @@ func TestInitialize(t *testing.T) {
 
 func TestInitializeCapacity(t *testing.T) {
 	// Test that the slice is pre-allocated with the correct capacity
-	instance := Initialize()
+	instance := New()
 	markyInstance := instance.(*marky.Marky)
 
 	// The slice should have exactly 7 elements (the registered loaders)
