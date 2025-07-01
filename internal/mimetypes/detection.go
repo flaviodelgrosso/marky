@@ -52,16 +52,17 @@ var (
 
 // MIME type constants
 const (
-	mimeDocx = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-	mimeXlsx = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-	mimePptx = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-	mimePdf  = "application/pdf"
-	mimeDoc  = "application/msword"
-	mimeXls  = "application/vnd.ms-excel"
-	mimePpt  = "application/vnd.ms-powerpoint"
-	mimeCsv  = "text/csv"
-	mimeHTML = "text/html"
-	mimeXML  = "application/xml"
+	mimeDocx  = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+	mimeXlsx  = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	mimePptx  = "application/vnd.openxmlformats-officedocument.presentationml.presentation"
+	mimePdf   = "application/pdf"
+	mimeDoc   = "application/msword"
+	mimeXls   = "application/vnd.ms-excel"
+	mimePpt   = "application/vnd.ms-powerpoint"
+	mimeCsv   = "text/csv"
+	mimeHTML  = "text/html"
+	mimeXML   = "application/xml"
+	mimeIpynb = "application/x-ipynb+json"
 )
 
 // enhanceMimeTypeDetection provides better detection for specific file types
@@ -102,6 +103,8 @@ func enhanceMimeTypeDetection(data []byte, ext, detectedType string) string {
 			return mimeHTML
 		case ".xml":
 			return mimeXML
+		case ".ipynb":
+			return mimeIpynb
 		}
 	}
 
@@ -140,6 +143,10 @@ func GetSupportedMimeTypes() map[string][]string {
 		},
 		"html": {
 			"text/html",
+		},
+		"ipynb": {
+			"application/x-ipynb+json",
+			"application/json",
 		},
 		"pdf": {
 			"application/pdf",

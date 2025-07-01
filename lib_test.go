@@ -14,7 +14,7 @@ func TestInitialize(t *testing.T) {
 	}{
 		{
 			name:              "Initialize should create marky instance with all loaders",
-			expectedLoaderLen: 6, // CSV, DOC, Excel, HTML, PDF, PPTX
+			expectedLoaderLen: 7, // CSV, DOC, Excel, HTML, IPYNB, PDF, PPTX
 		},
 	}
 
@@ -44,6 +44,7 @@ func TestInitialize(t *testing.T) {
 				"*loaders.DocLoader":   false,
 				"*loaders.ExcelLoader": false,
 				"*loaders.HtmlLoader":  false,
+				"*loaders.IpynbLoader": false,
 				"*loaders.PdfLoader":   false,
 				"*loaders.PptxLoader":  false,
 			}
@@ -58,6 +59,8 @@ func TestInitialize(t *testing.T) {
 					expectedTypes["*loaders.ExcelLoader"] = true
 				case *loaders.HTMLLoader:
 					expectedTypes["*loaders.HtmlLoader"] = true
+				case *loaders.IpynbLoader:
+					expectedTypes["*loaders.IpynbLoader"] = true
 				case *loaders.PdfLoader:
 					expectedTypes["*loaders.PdfLoader"] = true
 				case *loaders.PptxLoader:
@@ -79,8 +82,8 @@ func TestInitializeCapacity(t *testing.T) {
 	instance := Initialize()
 	markyInstance := instance.(*marky.Marky)
 
-	// The slice should have exactly 6 elements (the registered loaders)
-	if len(markyInstance.Loaders) != 6 {
-		t.Errorf("Expected 6 loaders, got %d", len(markyInstance.Loaders))
+	// The slice should have exactly 7 elements (the registered loaders)
+	if len(markyInstance.Loaders) != 7 {
+		t.Errorf("Expected 7 loaders, got %d", len(markyInstance.Loaders))
 	}
 }

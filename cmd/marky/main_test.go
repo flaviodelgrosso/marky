@@ -121,7 +121,7 @@ func TestMain_AllLoadersRegistered(t *testing.T) {
 	}
 
 	// Check that we have the expected number of loaders
-	expectedLoaderCount := 6 // CSV, DOC, Excel, HTML, PDF, PPTX
+	expectedLoaderCount := 7 // CSV, DOC, Excel, HTML, IPYNB, PDF, PPTX
 	if len(markyInstance.Loaders) != expectedLoaderCount {
 		t.Errorf("Expected %d loaders, got %d", expectedLoaderCount, len(markyInstance.Loaders))
 	}
@@ -134,6 +134,8 @@ func TestMain_AllLoadersRegistered(t *testing.T) {
 			"application/csv",
 			"text/html",
 			"application/pdf",
+			"application/json",
+			"application/x-ipynb+json",
 			"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 			"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
 			"application/vnd.openxmlformats-officedocument.presentationml.presentation",
