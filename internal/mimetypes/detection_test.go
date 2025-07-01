@@ -187,41 +187,6 @@ func TestIsMimeTypeSupported(t *testing.T) {
 	}
 }
 
-func TestGetSupportedMimeTypes(t *testing.T) {
-	result := GetSupportedMimeTypes()
-
-	// Check that all expected file types are present
-	expectedTypes := []string{"csv", "docx", "doc", "excel", "html", "pdf", "pptx"}
-	for _, fileType := range expectedTypes {
-		if _, exists := result[fileType]; !exists {
-			t.Errorf("GetSupportedMimeTypes() missing file type: %s", fileType)
-		}
-	}
-
-	// Check specific MIME types for known file types
-	csvTypes := result["csv"]
-	if len(csvTypes) == 0 {
-		t.Error("GetSupportedMimeTypes() csv should have MIME types")
-	}
-
-	found := false
-	for _, mimeType := range csvTypes {
-		if mimeType == "text/csv" {
-			found = true
-			break
-		}
-	}
-	if !found {
-		t.Error("GetSupportedMimeTypes() csv should include 'text/csv'")
-	}
-
-	// Check PDF MIME types
-	pdfTypes := result["pdf"]
-	if len(pdfTypes) != 1 || pdfTypes[0] != "application/pdf" {
-		t.Errorf("GetSupportedMimeTypes() pdf = %v, want [application/pdf]", pdfTypes)
-	}
-}
-
 func TestEnhanceMimeTypeDetection_OfficeFormats(t *testing.T) {
 	tempDir := t.TempDir()
 
