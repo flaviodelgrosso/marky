@@ -8,7 +8,7 @@ A powerful Go library and CLI tool for converting various document formats to Ma
 
 ## 🚀 Features
 
-- **Multiple Format Support**: Convert CSV, HTML, Jupiter Notebooks, Word, Excel, PDF, and PowerPoint files to Markdown
+- **Multiple Format Support**: Convert CSV, EPUB, HTML, Jupiter Notebooks, Word, Excel, PDF, and PowerPoint files to Markdown
 - **CLI Tool**: Easy-to-use command-line interface for quick conversions
 - **Go Library**: Integrate conversion capabilities into your Go applications
 - **MCP Server**: Model Context Protocol server for AI integration
@@ -20,6 +20,7 @@ A powerful Go library and CLI tool for converting various document formats to Ma
 | Format | Extensions | MIME Types |
 |--------|------------|------------|
 | **CSV** | `.csv` | `text/csv`, `application/csv` |
+| **EPUB** | `.epub` | `application/epub+zip`, `application/epub`, `application/x-epub+zip` |
 | **HTML** | `.html`, `.htm` | `text/html` |
 | **Jupyter Notebook** | `.ipynb` | `application/x-ipynb+json`, `application/json` |
 | **Microsoft Word** | `.docx` | `application/vnd.openxmlformats-officedocument.wordprocessingml.document` |

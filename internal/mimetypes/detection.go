@@ -62,12 +62,13 @@ const (
 	mimeHTML  = "text/html"
 	mimeXML   = "application/xml"
 	mimeIpynb = "application/x-ipynb+json"
+	mimeEpub  = "application/epub+zip"
 )
 
 // enhanceMimeTypeDetection provides better detection for specific file types
 func enhanceMimeTypeDetection(data []byte, ext, detectedType string) string {
 	// Check for signatures of known file types
-	if bytes.HasPrefix(data, zipSignature) { // Office Open XML formats (DOCX, XLSX, PPTX) are ZIP based
+	if bytes.HasPrefix(data, zipSignature) { // Office Open XML formats (DOCX, XLSX, PPTX) and EPUB are ZIP based
 		switch ext {
 		case ".docx":
 			return mimeDocx
@@ -75,6 +76,8 @@ func enhanceMimeTypeDetection(data []byte, ext, detectedType string) string {
 			return mimeXlsx
 		case ".pptx":
 			return mimePptx
+		case ".epub":
+			return mimeEpub
 		}
 	}
 

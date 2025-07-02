@@ -8,11 +8,12 @@ import (
 // Creates a new marky instance with all available loaders registered.
 func New() marky.IMarky {
 	m := &marky.Marky{
-		Loaders: make([]loaders.DocumentLoader, 0, 7), // Pre-allocate with known capacity
+		Loaders: make([]loaders.DocumentLoader, 0, 8),
 	}
 
 	m.RegisterLoader(&loaders.CsvLoader{})
 	m.RegisterLoader(&loaders.DocLoader{})
+	m.RegisterLoader(&loaders.EpubLoader{})
 	m.RegisterLoader(&loaders.ExcelLoader{})
 	m.RegisterLoader(&loaders.HTMLLoader{})
 	m.RegisterLoader(&loaders.IpynbLoader{})
