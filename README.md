@@ -11,6 +11,7 @@ A powerful Go library and CLI tool for converting various document formats to Ma
 - **Multiple Format Support**: Convert CSV, HTML, Jupiter Notebooks, Word, Excel, PDF, and PowerPoint files to Markdown
 - **CLI Tool**: Easy-to-use command-line interface for quick conversions
 - **Go Library**: Integrate conversion capabilities into your Go applications
+- **MCP Server**: Model Context Protocol server for AI integration
 - **MIME Type Detection**: Automatic file type detection for robust handling
 - **Extensible Architecture**: Plugin-based loader system for easy format additions
 
@@ -34,6 +35,14 @@ Install the CLI tool directly using Go:
 
 ```bash
 go install github.com/flaviodelgrosso/marky/cmd/marky@latest
+```
+
+### MCP Server
+
+Install the MCP (Model Context Protocol) server:
+
+```bash
+go install github.com/flaviodelgrosso/marky/marky-mcp@latest
 ```
 
 ### Library
@@ -62,6 +71,39 @@ marky document.xlsx -o converted.md
 marky presentation.pptx -o slides.md
 marky data.csv -o table.md
 marky webpage.html -o content.md
+```
+
+### MCP Server Usage
+
+The MCP server provides AI integration capabilities, allowing AI models to convert documents to Markdown through the Model Context Protocol.
+
+#### Running the MCP Server
+
+```bash
+# Start the MCP server
+marky-mcp
+```
+
+The server exposes a `convert_to_markdown` tool with the following parameters:
+
+- **`input`** (required): Path to the input file to convert to markdown
+- **`output`** (optional): Path to the output markdown file (defaults to console output)
+
+#### Integrating with AI Clients
+
+Configure your AI client (like Claude Desktop) to use the Marky MCP server by adding it to your MCP configuration. The server communicates via stdio and provides document conversion capabilities to AI models.
+
+This is an example of registering the MCP server in your Visual Studio Code settings:
+
+```json
+{
+    "servers": {
+        "marky-mcp": {
+            "type": "stdio",
+            "command": "marky-mcp",
+        }
+    }
+}
 ```
 
 ### Go Library
@@ -108,6 +150,9 @@ cd marky
 make build
 # OR
 go build -o bin/marky cmd/marky/main.go
+
+# Build the MCP server
+go build -o bin/marky-mcp cmd/marky-mcp/main.go
 
 # Run tests
 make test
@@ -167,6 +212,7 @@ This project is licensed under the ISC License. See the [LICENSE](LICENSE) file 
 - [pdf](https://github.com/ledongthuc/pdf) for PDF text extraction
 - [excelize](https://github.com/xuri/excelize) for Excel file processing
 - [cobra](https://github.com/spf13/cobra) for CLI framework
+- [mcp-go](https://github.com/mark3labs/mcp-go) for Model Context Protocol implementation
 
 ## 📞 Support
 
