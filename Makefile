@@ -34,4 +34,30 @@ inspector:
 	$(info ******************** running inspector ********************)
 	@npx @modelcontextprotocol/inspector go run mcp/main.go
 
-.PHONY: build run test lint clean
+.PHONY: build run test lint clean inspector patch minor major
+
+define bump_version
+	@latest=$$(git describe --tags --abbrev=0); \
+	base=$$(echo $$latest | sed 's/^v//'); \
+	IFS='.' read -r major minor patch <<< "$$base"; \
+	if [ "$(1)" = "major" ]; then \
+		major=$$((major+1)); minor=0; patch=0; \
+	elif [ "$(1)" = "minor" ]; then \
+		minor=$$((minor+1)); patch=0; \
+	else \
+		patch=$$((patch+1)); \
+	fi; \
+	new_tag="v$$major.$$minor.$$patch"; \
+	echo "Tagging $$new_tag"; \
+	git tag -a "$$new_tag" -m "Bump version to $$new_tag"; \
+	git push origin "$$new_tag"
+endef
+
+patch:
+	$(call bump_version,patch)
+
+minor:
+	$(call bump_version,minor)
+
+major:
+	$(call bump_version,major)
