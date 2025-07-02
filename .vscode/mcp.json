@@ -1,0 +1,7 @@
+{
+    "servers": {
+        "marky-mcp": {
+            "command": "marky-mcp",
+        }
+    }
+}
