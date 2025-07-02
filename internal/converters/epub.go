@@ -1,4 +1,4 @@
-package loaders
+package converters
 
 import (
 	"archive/zip"
@@ -10,11 +10,26 @@ import (
 	"strings"
 
 	html2md "github.com/JohannesKaufmann/html-to-markdown/v2"
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
 )
 
-// EpubLoader handles loading and converting EPUB files to markdown.
-type EpubLoader struct{}
+// EpubConverter handles loading and converting EPUB files to markdown.
+type EpubConverter struct {
+	BaseConverter
+}
+
+// NewEpubConverter creates a new EPUB converter with appropriate MIME types and extensions.
+func NewEpubConverter() Converter {
+	return &EpubConverter{
+		BaseConverter: NewBaseConverter(
+			[]string{".epub"},
+			[]string{
+				"application/epub",
+				"application/epub+zip",
+				"application/x-epub+zip",
+			},
+		),
+	}
+}
 
 // Container represents the META-INF/container.xml structure
 type Container struct {
@@ -62,7 +77,7 @@ type SpineItem struct {
 }
 
 // Load reads an EPUB file and converts it to markdown.
-func (*EpubLoader) Load(path string) (string, error) {
+func (*EpubConverter) Load(path string) (string, error) {
 	// Open the EPUB file as a ZIP archive
 	reader, err := zip.OpenReader(path)
 	if err != nil {
@@ -146,18 +161,6 @@ func (*EpubLoader) Load(path string) (string, error) {
 
 	return strings.Join(markdownParts, "\n\n"), nil
 }
-
-// CanLoadMimeType returns true if the MIME type is supported for EPUB files.
-func (*EpubLoader) CanLoadMimeType(mimeType string) bool {
-	supportedTypes := []string{
-		"application/epub",
-		"application/epub+zip",
-		"application/x-epub+zip",
-	}
-	return mimetypes.IsMimeTypeSupported(mimeType, supportedTypes)
-}
-
-// Helper functions
 
 func findFileInZip(reader *zip.Reader, filename string) (*zip.File, error) {
 	for _, file := range reader.File {

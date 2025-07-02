@@ -2,40 +2,49 @@ package marky
 
 import (
 	"fmt"
+	"slices"
 
-	"github.com/flaviodelgrosso/marky/internal/loaders"
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
+	"github.com/flaviodelgrosso/marky/internal/converters"
+	"github.com/gabriel-vasile/mimetype"
 )
 
-// Marky manages document loaders and provides conversion functionality.
+// Marky manages document converters and provides conversion functionality.
 type Marky struct {
-	Loaders []loaders.DocumentLoader
+	Converters []converters.Converter
 }
 
 type IMarky interface {
 	Convert(path string) (string, error)
 }
 
-// RegisterLoader adds a new document loader to the available loaders.
-func (m *Marky) RegisterLoader(loader loaders.DocumentLoader) {
-	m.Loaders = append(m.Loaders, loader)
+// RegisterConverter adds a new document converter to the available converters.
+func (m *Marky) RegisterConverter(converter converters.Converter) {
+	m.Converters = append(m.Converters, converter)
 }
 
 // Convert processes a document file and converts it to markdown format.
 // Returns the markdown content and an error if the conversion fails.
 func (m *Marky) Convert(path string) (string, error) {
 	// Detect MIME type from file content - this is mandatory
-	mimeInfo, err := mimetypes.DetectMimeType(path)
+	mtype, err := mimetype.DetectFile(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to detect MIME type: %w", err)
 	}
 
-	// Find a loader that can handle this MIME type
-	for _, loader := range m.Loaders {
-		if loader.CanLoadMimeType(mimeInfo.MimeType) {
-			return loader.Load(path)
+	// Find a converter that can handle this MIME type
+	for _, converter := range m.Converters {
+		if accepts(mtype, converter.AcceptedExtensions(), converter.AcceptedMimeTypes()) {
+			return converter.Load(path)
 		}
 	}
 
-	return "", fmt.Errorf("no loader found for MIME type %s", mimeInfo.MimeType)
+	return "", fmt.Errorf("no converter found for MIME type: %s", mtype.String())
+}
+
+func accepts(mtype *mimetype.MIME, extensions, mtypes []string) bool {
+	if slices.Contains(extensions, mtype.Extension()) {
+		return true
+	}
+
+	return slices.ContainsFunc(mtypes, mtype.Is)
 }

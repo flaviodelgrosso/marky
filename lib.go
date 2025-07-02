@@ -1,24 +1,24 @@
 package marky
 
 import (
-	"github.com/flaviodelgrosso/marky/internal/loaders"
+	"github.com/flaviodelgrosso/marky/internal/converters"
 	"github.com/flaviodelgrosso/marky/internal/marky"
 )
 
 // Creates a new marky instance with all available loaders registered.
 func New() marky.IMarky {
 	m := &marky.Marky{
-		Loaders: make([]loaders.DocumentLoader, 0, 8),
+		Converters: make([]converters.Converter, 0, 8),
 	}
 
-	m.RegisterLoader(&loaders.CsvLoader{})
-	m.RegisterLoader(&loaders.DocLoader{})
-	m.RegisterLoader(&loaders.EpubLoader{})
-	m.RegisterLoader(&loaders.ExcelLoader{})
-	m.RegisterLoader(&loaders.HTMLLoader{})
-	m.RegisterLoader(&loaders.IpynbLoader{})
-	m.RegisterLoader(&loaders.PdfLoader{})
-	m.RegisterLoader(&loaders.PptxLoader{})
+	m.RegisterConverter(converters.NewCsvConverter())
+	m.RegisterConverter(converters.NewDocConverter())
+	m.RegisterConverter(converters.NewEpubConverter())
+	m.RegisterConverter(converters.NewExcelConverter())
+	m.RegisterConverter(converters.NewHTMLConverter())
+	m.RegisterConverter(converters.NewIpynbConverter())
+	m.RegisterConverter(converters.NewPdfConverter())
+	m.RegisterConverter(converters.NewPptxConverter())
 
 	return m
 }

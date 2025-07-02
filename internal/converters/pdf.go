@@ -1,27 +1,30 @@
-package loaders
+package converters
 
 import (
 	"bytes"
 	"fmt"
 
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
 	"github.com/ledongthuc/pdf"
 )
 
-// PdfLoader handles loading and converting PDF files to text.
-type PdfLoader struct{}
-
-// Load reads a PDF file and extracts its text content.
-func (*PdfLoader) Load(path string) (string, error) {
-	return readPdfFile(path)
+// PdfConverter handles loading and converting PDF files to text.
+type PdfConverter struct {
+	BaseConverter
 }
 
-// CanLoadMimeType returns true if the MIME type is supported for PDF files.
-func (*PdfLoader) CanLoadMimeType(mimeType string) bool {
-	supportedTypes := []string{
-		"application/pdf",
+// NewPdfConverter creates a new PDF converter with appropriate MIME types and extensions.
+func NewPdfConverter() Converter {
+	return &PdfConverter{
+		BaseConverter: NewBaseConverter(
+			[]string{".pdf"},
+			[]string{"application/pdf"},
+		),
 	}
-	return mimetypes.IsMimeTypeSupported(mimeType, supportedTypes)
+}
+
+// Load reads a PDF file and extracts its text content.
+func (*PdfConverter) Load(path string) (string, error) {
+	return readPdfFile(path)
 }
 
 // readPdfFile reads and extracts text content from a PDF file.

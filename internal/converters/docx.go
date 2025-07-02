@@ -1,4 +1,4 @@
-package loaders
+package converters
 
 import (
 	"archive/zip"
@@ -14,31 +14,36 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
 	"github.com/flaviodelgrosso/marky/internal/utils"
 )
 
-// DocLoader handles loading and converting DOC and DOCX files to markdown.
-type DocLoader struct{}
+// DocConverter handles loading and converting DOC and DOCX files to markdown.
+type DocConverter struct {
+	BaseConverter
+}
+
+// NewDocConverter creates a new DOC converter with appropriate MIME types and extensions.
+func NewDocConverter() Converter {
+	return &DocConverter{
+		BaseConverter: NewBaseConverter(
+			[]string{".docx", ".doc"},
+			[]string{
+				"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+				"application/vnd.openxmlformats-officedocument.wordprocessingml",
+				"application/msword",
+			},
+		),
+	}
+}
 
 // Load reads a DOC or DOCX file and converts it to markdown.
-func (*DocLoader) Load(filePath string) (string, error) {
+func (*DocConverter) Load(filePath string) (string, error) {
 	content, err := convertDocxToMarkdown(filePath)
 	if err != nil {
 		return "", fmt.Errorf("failed to convert document: %w", err)
 	}
 
 	return content, nil
-}
-
-// CanLoadMimeType returns true if the MIME type is supported for DOC/DOCX files.
-func (*DocLoader) CanLoadMimeType(mimeType string) bool {
-	supportedTypes := []string{
-		"application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-		"application/vnd.openxmlformats-officedocument.wordprocessingml",
-		"application/msword",
-	}
-	return mimetypes.IsMimeTypeSupported(mimeType, supportedTypes)
 }
 
 // Relationship is

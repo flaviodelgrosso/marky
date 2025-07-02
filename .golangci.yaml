@@ -113,6 +113,11 @@ linters:
         linters:
           - govet
 
+      - path: _test\.go
+        linters:
+          - errcheck
+          - gosec
+
     presets:
       - comments
       - common-false-positives

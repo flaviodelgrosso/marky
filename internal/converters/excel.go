@@ -1,35 +1,40 @@
-package loaders
+package converters
 
 import (
 	"fmt"
 	"log"
 
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
 	"github.com/flaviodelgrosso/marky/internal/utils"
 	"github.com/xuri/excelize/v2"
 )
 
-// ExcelLoader handles loading and converting Excel files to markdown tables.
-type ExcelLoader struct{}
+// ExcelConverter handles loading and converting Excel files to markdown tables.
+type ExcelConverter struct {
+	BaseConverter
+}
+
+// NewExcelConverter creates a new Excel converter with appropriate MIME types and extensions.
+func NewExcelConverter() Converter {
+	return &ExcelConverter{
+		BaseConverter: NewBaseConverter(
+			[]string{".xlsx", ".xls"},
+			[]string{
+				"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+				"application/vnd.openxmlformats-officedocument.spreadsheetml",
+				"application/vnd.ms-excel",
+			},
+		),
+	}
+}
 
 // Load reads an Excel file and converts it to a markdown table.
-func (*ExcelLoader) Load(path string) (string, error) {
+func (*ExcelConverter) Load(path string) (string, error) {
 	rows, err := readExcelFile(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to load Excel file: %w", err)
 	}
 
 	return utils.ToMarkdownTable(rows), nil
-}
-
-// CanLoadMimeType returns true if the MIME type is supported for Excel files.
-func (*ExcelLoader) CanLoadMimeType(mimeType string) bool {
-	supportedTypes := []string{
-		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-		"application/vnd.openxmlformats-officedocument.spreadsheetml",
-		"application/vnd.ms-excel",
-	}
-	return mimetypes.IsMimeTypeSupported(mimeType, supportedTypes)
 }
 
 // readExcelFile reads and parses an Excel file, returning all records from the first sheet.

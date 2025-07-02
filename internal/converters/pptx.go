@@ -1,4 +1,4 @@
-package loaders
+package converters
 
 import (
 	"archive/zip"
@@ -12,35 +12,38 @@ import (
 	"os"
 	"regexp"
 	"strings"
-
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
 )
 
-type PptxLoader struct{}
+// PptxConverter handles loading and converting PPTX files to markdown.
+type PptxConverter struct {
+	BaseConverter
+}
+
+// NewPptxConverter creates a new PPTX converter with appropriate MIME types and extensions.
+func NewPptxConverter() Converter {
+	return &PptxConverter{
+		BaseConverter: NewBaseConverter(
+			[]string{".pptx"},
+			[]string{
+				"application/vnd.openxmlformats-officedocument.presentationml.presentation",
+				"application/vnd.openxmlformats-officedocument.presentationml",
+			},
+		),
+	}
+}
 
 // Load reads a PPTX file and converts it to markdown format.
-func (*PptxLoader) Load(path string) (string, error) {
+func (*PptxConverter) Load(path string) (string, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to read PPTX file: %w", err)
 	}
 
-	converter := NewPptxConverter()
-
-	result, err := converter.Convert(data, ConvertOptions{KeepDataURIs: true})
+	result, err := convertToMarkdown(data, ConvertOptions{KeepDataURIs: true})
 	if err != nil {
 		return "", fmt.Errorf("failed to convert PPTX to markdown: %w", err)
 	}
 	return result.Markdown, nil
-}
-
-// CanLoadMimeType returns true if the MIME type is supported for PPTX files.
-func (*PptxLoader) CanLoadMimeType(mimeType string) bool {
-	supportedTypes := []string{
-		"application/vnd.openxmlformats-officedocument.presentationml.presentation",
-		"application/vnd.openxmlformats-officedocument.presentationml",
-	}
-	return mimetypes.IsMimeTypeSupported(mimeType, supportedTypes)
 }
 
 // DocumentConverterResult represents the conversion result
@@ -48,43 +51,27 @@ type DocumentConverterResult struct {
 	Markdown string
 }
 
-// PptxConverter handles PPTX to Markdown conversion
-type PptxConverter struct {
-	acceptedMimeTypePrefixes []string
-	acceptedExtensions       []string
-}
-
 // ConvertOptions holds configuration for the conversion
 type ConvertOptions struct {
 	KeepDataURIs bool
 }
 
-// NewPptxConverter creates a new PPTX converter
-func NewPptxConverter() *PptxConverter {
-	return &PptxConverter{
-		acceptedMimeTypePrefixes: []string{
-			"application/vnd.openxmlformats-officedocument.presentationml",
-		},
-		acceptedExtensions: []string{".pptx"},
-	}
-}
-
 // Convert converts PPTX content to Markdown
-func (p *PptxConverter) Convert(data []byte, options ConvertOptions) (*DocumentConverterResult, error) {
+func convertToMarkdown(data []byte, options ConvertOptions) (*DocumentConverterResult, error) {
 	reader := bytes.NewReader(data)
 	zipReader, err := zip.NewReader(reader, int64(len(data)))
 	if err != nil {
 		return nil, fmt.Errorf("failed to open PPTX file: %w", err)
 	}
 
-	presentation, err := p.parsePresentationXML(zipReader)
+	presentation, err := parsePresentationXML(zipReader)
 	if err != nil {
 		return nil, fmt.Errorf("failed to parse presentation: %w", err)
 	}
 
-	slides := p.parseSlides(zipReader, presentation)
+	slides := parseSlides(zipReader, presentation)
 
-	markdown := p.convertSlidesToMarkdown(slides, zipReader, options)
+	markdown := convertSlidesToMarkdown(slides, zipReader, options)
 
 	return &DocumentConverterResult{
 		Markdown: strings.TrimSpace(markdown),
@@ -194,7 +181,7 @@ type Notes struct {
 	Text string `xml:",innerxml"`
 }
 
-func (*PptxConverter) parsePresentationXML(zipReader *zip.Reader) (*Presentation, error) {
+func parsePresentationXML(zipReader *zip.Reader) (*Presentation, error) {
 	for _, file := range zipReader.File {
 		if file.Name == "ppt/presentation.xml" {
 			rc, err := file.Open()
@@ -220,7 +207,7 @@ func (*PptxConverter) parsePresentationXML(zipReader *zip.Reader) (*Presentation
 	return nil, errors.New("presentation.xml not found")
 }
 
-func (p *PptxConverter) parseSlides(zipReader *zip.Reader, presentation *Presentation) []*Slide {
+func parseSlides(zipReader *zip.Reader, presentation *Presentation) []*Slide {
 	var slides []*Slide
 
 	for i := range presentation.SlideIDs {
@@ -247,7 +234,7 @@ func (p *PptxConverter) parseSlides(zipReader *zip.Reader, presentation *Present
 
 				// Try to parse notes
 				notesFile := fmt.Sprintf("ppt/notesSlides/notesSlide%d.xml", i+1)
-				p.parseSlideNotes(zipReader, notesFile, &slide)
+				parseSlideNotes(zipReader, notesFile, &slide)
 
 				slides = append(slides, &slide)
 				break
@@ -258,7 +245,7 @@ func (p *PptxConverter) parseSlides(zipReader *zip.Reader, presentation *Present
 	return slides
 }
 
-func (*PptxConverter) parseSlideNotes(zipReader *zip.Reader, notesFile string, slide *Slide) {
+func parseSlideNotes(zipReader *zip.Reader, notesFile string, slide *Slide) {
 	for _, file := range zipReader.File {
 		if file.Name == notesFile {
 			rc, err := file.Open()
@@ -293,7 +280,7 @@ func (*PptxConverter) parseSlideNotes(zipReader *zip.Reader, notesFile string, s
 	}
 }
 
-func (p *PptxConverter) convertSlidesToMarkdown(slides []*Slide, zipReader *zip.Reader, options ConvertOptions) string {
+func convertSlidesToMarkdown(slides []*Slide, zipReader *zip.Reader, options ConvertOptions) string {
 	var markdown strings.Builder
 
 	for i, slide := range slides {
@@ -301,10 +288,10 @@ func (p *PptxConverter) convertSlidesToMarkdown(slides []*Slide, zipReader *zip.
 		markdown.WriteString(fmt.Sprintf("\n\n<!-- Slide number: %d -->\n", slideNum))
 
 		// Process shapes, pictures, and tables
-		p.processShapes(slide.CommonSlideData.ShapeTree.Shapes, &markdown, true)
-		p.processPics(slide.CommonSlideData.ShapeTree.Pics, &markdown, zipReader, options)
-		p.processTables(slide.CommonSlideData.ShapeTree.Tables, &markdown)
-		p.processGroups(slide.CommonSlideData.ShapeTree.Groups, &markdown, zipReader, options)
+		processShapes(slide.CommonSlideData.ShapeTree.Shapes, &markdown, true)
+		processPics(slide.CommonSlideData.ShapeTree.Pics, &markdown, zipReader, options)
+		processTables(slide.CommonSlideData.ShapeTree.Tables, &markdown)
+		processGroups(slide.CommonSlideData.ShapeTree.Groups, &markdown, zipReader, options)
 
 		// Add notes if present
 		if slide.Notes != nil && slide.Notes.Text != "" {
@@ -316,11 +303,11 @@ func (p *PptxConverter) convertSlidesToMarkdown(slides []*Slide, zipReader *zip.
 	return markdown.String()
 }
 
-func (p *PptxConverter) processShapes(shapes []Shape, markdown *strings.Builder, isTitle bool) {
+func processShapes(shapes []Shape, markdown *strings.Builder, isTitle bool) {
 	// Sort shapes by position (simplified - just by order for now)
 	for _, shape := range shapes {
 		if shape.TextBody != nil {
-			text := p.extractTextFromTextBody(shape.TextBody)
+			text := extractTextFromTextBody(shape.TextBody)
 			if text != "" {
 				if isTitle && len(shapes) > 0 {
 					markdown.WriteString("# ")
@@ -336,7 +323,7 @@ func (p *PptxConverter) processShapes(shapes []Shape, markdown *strings.Builder,
 	}
 }
 
-func (p *PptxConverter) processPics(pics []Pic, markdown *strings.Builder, zipReader *zip.Reader, options ConvertOptions) {
+func processPics(pics []Pic, markdown *strings.Builder, zipReader *zip.Reader, options ConvertOptions) {
 	for _, pic := range pics {
 		altText := pic.NvPicPr.CNvPr.Descr
 		if altText == "" {
@@ -350,35 +337,35 @@ func (p *PptxConverter) processPics(pics []Pic, markdown *strings.Builder, zipRe
 
 		if options.KeepDataURIs && pic.BlipFill.Blip.Embed != "" {
 			// Try to get the actual image data
-			imageData := p.getImageData(zipReader)
+			imageData := getImageData(zipReader)
 			if imageData != nil {
 				b64String := base64.StdEncoding.EncodeToString(imageData)
 				fmt.Fprintf(markdown, "\n![%s](data:image/png;base64,%s)\n", altText, b64String)
 			} else {
-				fmt.Fprintf(markdown, "\n![%s](%s.jpg)\n", altText, p.sanitizeFilename(altText))
+				fmt.Fprintf(markdown, "\n![%s](%s.jpg)\n", altText, sanitizeFilename(altText))
 			}
 		} else {
-			filename := p.sanitizeFilename(altText) + ".jpg"
+			filename := sanitizeFilename(altText) + ".jpg"
 			fmt.Fprintf(markdown, "\n![%s](%s)\n", altText, filename)
 		}
 	}
 }
 
-func (p *PptxConverter) processTables(tables []Table, markdown *strings.Builder) {
+func processTables(tables []Table, markdown *strings.Builder) {
 	for _, table := range tables {
-		markdown.WriteString(p.convertTableToMarkdown(table.Graphic.GraphicData.Table))
+		markdown.WriteString(convertTableToMarkdown(table.Graphic.GraphicData.Table))
 	}
 }
 
-func (p *PptxConverter) processGroups(groups []Group, markdown *strings.Builder, zipReader *zip.Reader, options ConvertOptions) {
+func processGroups(groups []Group, markdown *strings.Builder, zipReader *zip.Reader, options ConvertOptions) {
 	for _, group := range groups {
-		p.processShapes(group.Shapes, markdown, false)
-		p.processPics(group.Pics, markdown, zipReader, options)
-		p.processTables(group.Tables, markdown)
+		processShapes(group.Shapes, markdown, false)
+		processPics(group.Pics, markdown, zipReader, options)
+		processTables(group.Tables, markdown)
 	}
 }
 
-func (*PptxConverter) extractTextFromTextBody(textBody *TextBody) string {
+func extractTextFromTextBody(textBody *TextBody) string {
 	var text strings.Builder
 
 	for _, paragraph := range textBody.Paragraphs {
@@ -391,7 +378,7 @@ func (*PptxConverter) extractTextFromTextBody(textBody *TextBody) string {
 	return strings.TrimSpace(text.String())
 }
 
-func (p *PptxConverter) convertTableToMarkdown(table TableData) string {
+func convertTableToMarkdown(table TableData) string {
 	if len(table.Rows) == 0 {
 		return ""
 	}
@@ -402,7 +389,7 @@ func (p *PptxConverter) convertTableToMarkdown(table TableData) string {
 	if len(table.Rows) > 0 {
 		markdown.WriteString("|")
 		for _, cell := range table.Rows[0].Cells {
-			cellText := p.extractTextFromTextBody(&cell.TextBody)
+			cellText := extractTextFromTextBody(&cell.TextBody)
 			cellText = html.EscapeString(cellText)
 			markdown.WriteString(" ")
 			markdown.WriteString(cellText)
@@ -422,7 +409,7 @@ func (p *PptxConverter) convertTableToMarkdown(table TableData) string {
 	for i := 1; i < len(table.Rows); i++ {
 		markdown.WriteString("|")
 		for _, cell := range table.Rows[i].Cells {
-			cellText := p.extractTextFromTextBody(&cell.TextBody)
+			cellText := extractTextFromTextBody(&cell.TextBody)
 			cellText = html.EscapeString(cellText)
 			markdown.WriteString(" ")
 			markdown.WriteString(cellText)
@@ -434,7 +421,7 @@ func (p *PptxConverter) convertTableToMarkdown(table TableData) string {
 	return markdown.String()
 }
 
-func (*PptxConverter) getImageData(zipReader *zip.Reader) []byte {
+func getImageData(zipReader *zip.Reader) []byte {
 	// This is a simplified version - in a real implementation,
 	// you'd need to parse the relationship files to map embed IDs to actual files
 	for _, file := range zipReader.File {
@@ -456,7 +443,7 @@ func (*PptxConverter) getImageData(zipReader *zip.Reader) []byte {
 	return nil
 }
 
-func (*PptxConverter) sanitizeFilename(filename string) string {
+func sanitizeFilename(filename string) string {
 	re := regexp.MustCompile(`\W`)
 	return re.ReplaceAllString(filename, "")
 }

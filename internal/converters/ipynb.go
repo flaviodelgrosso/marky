@@ -1,16 +1,26 @@
-package loaders
+package converters
 
 import (
 	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
-
-	"github.com/flaviodelgrosso/marky/internal/mimetypes"
 )
 
-// IpynbLoader handles loading and converting Jupyter Notebook (.ipynb) files to markdown.
-type IpynbLoader struct{}
+// IpynbConverter handles loading and converting Jupyter Notebook (.ipynb) files to markdown.
+type IpynbConverter struct {
+	BaseConverter
+}
+
+// NewIpynbConverter creates a new Jupyter Notebook converter with appropriate MIME types and extensions.
+func NewIpynbConverter() Converter {
+	return &IpynbConverter{
+		BaseConverter: NewBaseConverter(
+			[]string{".ipynb"},
+			[]string{"application/x-ipynb+json", "application/json"},
+		),
+	}
+}
 
 // NotebookCell represents a cell in a Jupyter notebook.
 type NotebookCell struct {
@@ -32,7 +42,7 @@ type JupyterNotebook struct {
 }
 
 // Load reads a Jupyter notebook file and converts it to markdown.
-func (*IpynbLoader) Load(path string) (string, error) {
+func (*IpynbConverter) Load(path string) (string, error) {
 	content, err := os.ReadFile(path)
 	if err != nil {
 		return "", fmt.Errorf("failed to read ipynb file: %w", err)
@@ -45,15 +55,6 @@ func (*IpynbLoader) Load(path string) (string, error) {
 	}
 
 	return convertNotebookToMarkdown(notebook), nil
-}
-
-// CanLoadMimeType returns true if the MIME type is supported for Jupyter notebook files.
-func (*IpynbLoader) CanLoadMimeType(mimeType string) bool {
-	supportedTypes := []string{
-		"application/json",
-		"application/x-ipynb+json",
-	}
-	return mimetypes.IsMimeTypeSupported(mimeType, supportedTypes)
 }
 
 // convertNotebookToMarkdown converts a Jupyter notebook to markdown format.
