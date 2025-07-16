@@ -528,7 +528,7 @@ func writeMarkdownTable(rows [][]string, widths []int, maxcol int, w io.Writer) 
 
 func writeTableHeader(widths []int, maxcol int, w io.Writer) {
 	// Write empty header row
-	for j := 0; j < maxcol; j++ {
+	for j := range maxcol {
 		fmt.Fprint(w, "|")
 		fmt.Fprint(w, strings.Repeat(" ", widths[j]))
 	}
