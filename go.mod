@@ -4,7 +4,7 @@ go 1.24.4
 
 require (
 	github.com/JohannesKaufmann/html-to-markdown/v2 v2.4.0
-	github.com/gabriel-vasile/mimetype v1.4.10
+	github.com/gabriel-vasile/mimetype v1.4.11
 	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	github.com/mark3labs/mcp-go v0.42.0
 	github.com/spf13/cobra v1.10.1
