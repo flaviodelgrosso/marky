@@ -3,7 +3,7 @@ module github.com/flaviodelgrosso/marky
 go 1.24.4
 
 require (
-	github.com/JohannesKaufmann/html-to-markdown/v2 v2.4.0
+	github.com/JohannesKaufmann/html-to-markdown/v2 v2.5.0
 	github.com/gabriel-vasile/mimetype v1.4.11
 	github.com/ledongthuc/pdf v0.0.0-20250511090121-5959a4027728
 	github.com/mark3labs/mcp-go v0.43.2
@@ -28,8 +28,8 @@ require (
 	github.com/xuri/efp v0.0.1 // indirect
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
-	golang.org/x/crypto v0.43.0 // indirect
-	golang.org/x/net v0.46.0 // indirect
-	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/crypto v0.44.0 // indirect
+	golang.org/x/net v0.47.0 // indirect
+	golang.org/x/text v0.31.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
