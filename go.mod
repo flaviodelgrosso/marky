@@ -1,9 +1,9 @@
 module github.com/flaviodelgrosso/marky
 
-go 1.24.4
+go 1.25.0
 
 require (
-	github.com/JohannesKaufmann/html-to-markdown/v2 v2.5.0
+	github.com/JohannesKaufmann/html-to-markdown/v2 v2.5.2
 	github.com/gabriel-vasile/mimetype v1.4.15
 	github.com/ledongthuc/pdf v0.0.0-20260903153007-b3c860c23753
 	github.com/mark3labs/mcp-go v0.48.0
@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/JohannesKaufmann/dom v0.2.0 // indirect
+	github.com/JohannesKaufmann/dom v0.3.1 // indirect
 	github.com/bahlo/generic-list-go v0.2.0 // indirect
 	github.com/buger/jsonparser v1.1.1 // indirect
 	github.com/google/jsonschema-go v0.4.2 // indirect
@@ -29,8 +29,8 @@ require (
 	github.com/xuri/efp v0.0.1 // indirect
 	github.com/xuri/nfp v0.0.2-0.20250530014748-2ddeb826f9a9 // indirect
 	github.com/yosida95/uritemplate/v3 v3.0.2 // indirect
-	golang.org/x/crypto v0.48.0 // indirect
-	golang.org/x/net v0.50.0 // indirect
-	golang.org/x/text v0.34.0 // indirect
+	golang.org/x/crypto v0.51.0 // indirect
+	golang.org/x/net v0.55.0 // indirect
+	golang.org/x/text v0.37.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
